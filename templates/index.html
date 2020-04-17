@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Последние обновления{% endblock %}
+{% block content %}
+
+    {% for post in posts %}
+    <h3>
+        Автор: {{ post.author.get_full_name }}, Дата публикации: {{ post.pub_date|date:"d M Y" }}
+    </h3>
+
+    <p>{{ post.text|linebreaksbr }}</p>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="btn-group ">
+                {% if user == post.author %}
+                    <a class="btn btn-sm text-muted" href="/{{ post.author.username }}/{{post.id}}/edit" role="button">Редактировать</a>
+                {% else %}
+                    <a class="btn btn-sm text-muted" href="/{{ post.author.username }}/{{post.id}}" role="button">Просмотр</a>
+                {% endif %}
+            </div>
+        </div>
+    <hr>
+    {% endfor %}
+
+{% endblock %}
