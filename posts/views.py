@@ -41,11 +41,6 @@ def new_post(request):
     return render(request, 'new_post.html', {'form': form})
 
 
-def group_all(request):
-    groups = Group.objects.all()
-    return render(request, 'group_all.html', {'groups': groups})
-
-
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = Post.objects.filter(author=author).order_by('-pub_date').all()
