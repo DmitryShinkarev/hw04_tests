@@ -61,12 +61,11 @@ def profile(request, username):
 
 
 def post_view(request, username, post_id):
-    author = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=author, id=post_id)
-    quantity = Post.objects.filter(author=author).count()
-    return render(request, 'post.html', {'posts': posts,
-                                         'author': author,
-                                         'quantity': quantity})
+    # тут тело функции
+    profile = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, author=profile.pk, id=post_id)
+    count = Post.objects.filter(author=profile).count
+    return render(request, "post.html", {"profile": profile, 'post': post, "count": count, })
 
 
 def post_edit(request, username, post_id):
