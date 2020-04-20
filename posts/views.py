@@ -47,17 +47,17 @@ def new_post(request):
 
 
 def profile(request, username):
-    author = get_object_or_404(User, username=username)
-    post_list = Post.objects.filter(author=author).order_by('-pub_date').all()
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
-    posts = paginator.get_page(page_number)
-    quantity = Post.objects.filter(author=author).count()
-
-    return render(request, 'post.html', {'posts': posts,
-                                         'author': author,
-                                         'paginator': paginator,
-                                         'quantity': quantity})
+    profile = get_object_or_404(User, username=username)
+    post_list = Post.objects.filter(author=profile.pk)
+    id_of_post = Post.objects.filter(author=profile.pk, id=None)
+    posts_all = Post.objects.filter(author=profile).order_by('-pub_date').all()
+    posts_count = posts_all.count()
+    paginator = Paginator(post_list, 10)  # показывать по 10 записей на странице.
+    page_number = request.GET.get('page')  # переменная в URL с номером запрошенной страницы
+    page = paginator.get_page(page_number)  # получить записи с нужным смещением
+    return render(request, "profile.html",
+                  {"profile": profile, 'post_list': post_list, "count": posts_count, 'post_id': id_of_post,
+                   'page': page, "paginator": paginator})
 
 
 def post_view(request, username, post_id):
