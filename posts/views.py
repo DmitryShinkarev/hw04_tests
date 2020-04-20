@@ -29,16 +29,20 @@ def group_posts(request, slug):
 
 @login_required
 def new_post(request):
+    button = "Создать"
+    title = "Новая запись"
     if request.method == 'POST':
         form = PostForm(request.POST)
         if form.is_valid():
-            Post.objects.create(text=form.cleaned_data['text'],
-                                group=form.cleaned_data['group'],
-                                author=request.user)
-            return redirect('index')
-        return render(request, 'new_post.html', {'form': form})
+            text = form.cleaned_data['text']
+            group = form.cleaned_data['group']
+            author = request.user
+            pub_date = timezone.now()
+            post = Post.objects.create(text=text, pub_date=pub_date, author=author, group=group)
+            return redirect('post:index')
+        return render(request, "new_post.html", {"form": form, 'button': button, 'title': title})
     form = PostForm()
-    return render(request, 'new_post.html', {'form': form})
+    return render(request, 'new_post.html', {'form':form, 'button': button, 'title': title})
 
 
 def profile(request, username):
@@ -65,16 +69,22 @@ def post_view(request, username, post_id):
 
 
 def post_edit(request, username, post_id):
-    edited_post = Post.objects.get(id=post_id)
-    if request.method == 'POST':
-        form = PostForm(request.POST, instance=edited_post)
-        if form.is_valid():
-            edited_post.text = form.cleaned_data['text']
-            edited_post.group = form.cleaned_data['group']
-            edited_post.save()
-            return redirect('index')
-        return render(request, 'new_post.html', {'form': form})
-    form = PostForm(instance=edited_post)
-    edit = True
-    return render(request, 'new_post.html', {'form': form,
-                                             'edit': edit})
+    profile = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, pk=post_id, author = profile.pk)
+    button = "Сохранить"
+    title = "Редактирование записи"
+    if request.method == "GET":
+        if request.user.username != username:
+             return redirect('post:post', username=post.author, post_id=post.pk)
+        form = PostForm(instance=post)
+        return render(request, 'new_post.html', {'form': form, 'button': button, 'title': title, 'post': post})
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
+        if request.user.username == username:
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.save()
+                return redirect('post:post', username=post.author, post_id=post.pk)
+            return render(request, 'new_post.html', {'form': form, 'button': button, 'title': title, 'post': post})
+        return redirect('post:post', username=post.author, post_id=post.pk)
