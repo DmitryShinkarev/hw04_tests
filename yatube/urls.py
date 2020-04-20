@@ -18,24 +18,19 @@ from django.urls import path, include
 from django.contrib.flatpages import views
 
 urlpatterns = [
-
-    # импорт правил из приложения admin
-    path("admin/", admin.site.urls),
-
-    # импорт правил из приложения posts
-    path("", include("posts.urls")),
-
-    #  регистрация и авторизация
-    path("auth/", include("users.urls")),
-
-    #  если нужного шаблона для /auth не нашлось в файле users.urls —
-    #  ищем совпадения в файле django.contrib.auth.urls
-    path("auth/", include("django.contrib.auth.urls")),
-
+    path('admin/', admin.site.urls),
+    path("about/", include("django.contrib.flatpages.urls")),
+    path('', include('posts.urls')),
+    path('auth/', include('users.urls')),
+    path('auth/', include('django.contrib.auth.urls')),
 ]
+
 urlpatterns += [
-        path('about-us/', views.flatpage, {'url': '/about-us/'}, name='about'),
-        path('terms/', views.flatpage, {'url': '/terms/'}, name='terms'),
-        path('about-author/', views.flatpage, {'url': '/about-author/'}, name='author'),
-        path('about-spec/', views.flatpage, {'url': '/about-spec/'}, name='spec'),
+    path('about-author/', views.flatpage, {'url': '/about-author/'}, name='author'),
+    path('about-spec/', views.flatpage, {'url': '/about-spec/'}, name='spec'),
+]
+
+urlpatterns += [
+    path('about-us/', views.flatpage, {'url': '/about-us/'}, name='about'),
+    path('terms/', views.flatpage, {'url': '/terms/'}, name='terms'),
 ]
