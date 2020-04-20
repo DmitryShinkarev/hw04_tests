@@ -1,4 +1,4 @@
-{% extends "base_post.html" %}
+{% extends "base_form.html" %}
 {% block title %} {% if edit %} Редактирование поста {% else %}Создание поста{% endif %} {% endblock %}
 {% block header %} {% if edit %} Редактирование поста {% else %}Создание поста{% endif %}  {% endblock %}
-{% block button %} {% if edit %} Редактировать {% else %} Добавить запись {% endif %} {% endblock %}
+{% block button %} {% if edit %} Сохранить !{% else %}Отправить!{% endif %} {% endblock %} 
