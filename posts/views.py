@@ -129,3 +129,4 @@ def post_edit(request, username, post_id):
             post.save()
             return redirect('post:post', username=post.author, post_id=post.pk)
         return render(request, 'new_post.html', {'form': form, 'button': button, 'title': title, 'post': post})
+
