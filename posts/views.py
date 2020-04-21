@@ -73,14 +73,14 @@ def post_edit(request, username, post_id):
     post = get_object_or_404(Post, pk=post_id, author = profile.pk)
     button = "Сохранить"
     title = "Редактирование записи"
-    if request.method == "GET":
-        if request.user.username != username:
+    if request.user.username != username:
+        if request.method == "GET":
              return redirect('post:post', username=post.author, post_id=post.pk)
         form = PostForm(instance=post)
         return render(request, 'new_post.html', {'form': form, 'button': button, 'title': title, 'post': post})
-    if request.method == "POST":
-        form = PostForm(request.POST, instance=post)
-        if request.user.username == username:
+    else:
+        if request.method == "POST":
+            form = PostForm(request.POST, instance=post)
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = request.user
@@ -88,3 +88,44 @@ def post_edit(request, username, post_id):
                 return redirect('post:post', username=post.author, post_id=post.pk)
             return render(request, 'new_post.html', {'form': form, 'button': button, 'title': title, 'post': post})
         return redirect('post:post', username=post.author, post_id=post.pk)
+
+def post_edit(request, username, post_id):
+    profile = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, pk=post_id, author=profile.pk)
+    button = "Сохранить"
+    title = "Редактирование записи"
+    edited_post = Post.objects.get(id=post_id)
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=edited_post)
+        if form.is_valid():
+            edited_post.text = form.cleaned_data['text']
+            edited_post.group = form.cleaned_data['group']
+            edited_post.save()
+            return redirect('index')
+        return render(request, 'new_post.html', {'form': form})
+    form = PostForm(instance=edited_post)
+    edit = True
+    return render(request, 'new_post.html', {'form': form,
+                                             'edit': edit})
+
+
+
+
+def post_edit(request, username, post_id):
+    profile = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, pk=post_id, author = profile.pk)
+    button = "Сохранить"
+    title = "Редактирование записи"
+    if request.user.username != username:
+        return redirect('post:post', username=post.author, post_id=post.pk)
+    if request.method == "GET":
+        form = PostForm(instance=post)
+        return render(request, 'new_post.html', {'form': form, 'button': button, 'title': title, 'post': post})
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('post:post', username=post.author, post_id=post.pk)
+        return render(request, 'new_post.html', {'form': form, 'button': button, 'title': title, 'post': post})
